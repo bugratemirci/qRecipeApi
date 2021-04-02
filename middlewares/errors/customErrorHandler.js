@@ -1,6 +1,7 @@
 const CustomError = require("../../helpers/errors/CustomError");
 
 const customErrorHandler = (err, req, res, next) => {
+    
     let customError = err;
     
     if(err.name === 'SyntaxError'){
@@ -9,7 +10,9 @@ const customErrorHandler = (err, req, res, next) => {
     if(err.name === 'ValidationError'){
         customError = new CustomError(err.message, 400);
     }
-    
+    if(err.code == 11000){
+        customError = new CustomError("Dulicate Key Found: Check Your Input", 400);
+    }
     res
     .status(customError.status || 500)
     .json({
