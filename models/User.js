@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
-var bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
-
 const Schema = mongoose.Schema;
+const crypto = require('crypto');
 
 const UserSchema = new Schema({
 
@@ -13,7 +13,7 @@ const UserSchema = new Schema({
     email: {
         type: String,
         required: [true, "Please provide a email"],
-        unique: [true, "Please try different email addresses."],
+        unique: true,
         match: [
             /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
             "Please provide a valid email."
@@ -53,14 +53,19 @@ const UserSchema = new Schema({
     blocked: {
         type: Boolean,
         default: false,
+    },
+    resetPasswordToken: {
+        type: String,
+    },
+    resetPasswordExpire: {
+        type: Date,
     }
-
 });
 
 // UserSchema Methods
 
-UserSchema.methods.generateJwtFromUser = function() {
-    const {JWT_SECRET_KEY, JWT_EXPIRE} = process.env;
+UserSchema.methods.generateJwtFromUser = function () {
+    const { JWT_SECRET_KEY, JWT_EXPIRE } = process.env;
     const payload = {
         id: this._id,
         name: this.name
@@ -72,10 +77,23 @@ UserSchema.methods.generateJwtFromUser = function() {
 
     return token;
 };
+UserSchema.methods.getResetPasswordTokenFromUser = function () {
+    const randomHexString = crypto.randomBytes(15).toString("hex");
+    const {RESET_PASSWORD_EXPIRE} = process.env;
 
+    const resetPasswordToken = crypto
+    .createHash("SHA256")
+    .update(randomHexString)
+    .digest("hex");
+    
+    this.resetPasswordToken = resetPasswordToken;
+    this.resetPasswordExpire = Date.now() + parseInt(RESET_PASSWORD_EXPIRE);
+
+    return resetPasswordToken;
+};
 UserSchema.pre("save", function (next) {
     // Parola değişmemişse 
-    if(!this.isModified("password")) {
+    if (!this.isModified("password")) {
         next();
     }
     bcrypt.genSalt(10, (err, salt) => {
