@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Recipe = require("../models/Recipe");
 const CustomError = require("../helpers/errors/CustomError");
 const asyncErrorWrapper = require("express-async-handler");
 
@@ -31,7 +32,22 @@ const deleteUser = asyncErrorWrapper(async (req, res, next) => {
             message: "User deleted"
         });
 });
+
+const deleteRecipe = asyncErrorWrapper(async (req, res, next) => {
+    const { id } = req.params;
+    const recipe = await Recipe.findById(id);
+
+    await recipe.remove();
+
+    return res
+    .status(200)
+    .json({
+        success: true,
+        message: "Recipe deleted"
+    })
+});
 module.exports = {
     blockUser,
-    deleteUser
+    deleteUser,
+    deleteRecipe
 };

@@ -30,7 +30,25 @@ const enterARecipe = asyncErrorWrapper(async (req, res, next) => {
             data: recipe
         });
 });
+
+const editRecipe = asyncErrorWrapper(async (req, res, next) => {
+    const { id } = req.params;
+    const editInformation = req.body;
+    
+    const recipe = await Recipe.findByIdAndUpdate(id,editInformation, {
+        new: true,
+        runValidators: true
+    });
+
+    return res.status(200).json({
+        success: true,
+        data: recipe
+    });
+
+    
+})
 module.exports = {
     getAllRecipes,
-    enterARecipe
+    enterARecipe,
+    editRecipe
 };
