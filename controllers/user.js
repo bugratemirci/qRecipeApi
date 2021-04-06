@@ -146,6 +146,21 @@ const resetPassword = asyncErrorWrapper(async (req, res, next) => {
             message: "Reset password successful"
         });
 });
+
+const editDetails = asyncErrorWrapper(async (req, res, next) => {
+    const editInformation = req.body;
+
+    const user = await User.findByIdAndUpdate(req.user.id, editInformation,{
+        new: true,
+        runValidators: true
+    });
+
+    return res.status(200).json({
+        success: true,
+        data:user
+    });
+});
+
 module.exports = {
     getAllUsers,
     register,
@@ -154,5 +169,6 @@ module.exports = {
     login,
     logout,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    editDetails
 };

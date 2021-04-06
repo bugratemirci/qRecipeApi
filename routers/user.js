@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, register, imageUpload, getUser, login, logout, forgotPassword, resetPassword } = require('../controllers/user');
+const { getAllUsers, register, imageUpload, getUser, login, logout, forgotPassword, resetPassword, editDetails } = require('../controllers/user');
 const profileImageUpload = require('../middlewares/libraries/profileImageUpload');
 const { getAccessToRoute } = require('../middlewares/authorization/auth');
 
@@ -13,4 +13,5 @@ router.post("/login", login);
 router.get("/logout", logout);
 router.post("/forgotPassword", forgotPassword);
 router.put("/resetPassword", resetPassword);
+router.put("/edit", getAccessToRoute, editDetails)
 module.exports = router;
