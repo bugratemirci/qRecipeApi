@@ -9,10 +9,7 @@ const getAllUsers = async (req, res, next) => {
     const users = await User.find();
     res
         .status(200)
-        .json({
-            success: true,
-            data: users
-        });
+        .json(users);
 };
 const register = asyncErrorWrapper(async (req, res, next) => {
     // Post data
@@ -23,6 +20,7 @@ const register = asyncErrorWrapper(async (req, res, next) => {
         password,
         role
     });
+
     sendJwtClient(user, res);
 });
 
@@ -44,11 +42,8 @@ const imageUpload = asyncErrorWrapper(async (req, res, next) => {
 });
 const getUser = (req, res, next) => {
     res.status(200).json({
-        success: true,
-        data: {
-            id: req.user.id,
-            name: req.user.name
-        }
+        id: req.user.id,
+        name: req.user.name
     })
 };
 
@@ -62,7 +57,7 @@ const login = asyncErrorWrapper(async (req, res, next) => {
     if (!comparePassword(password, user.password)) {
         return next(new CustomError("Please check your password", 400));
     }
-
+    console.log(user.name + " tarafından giriş yapıldı");
     sendJwtClient(user, res);
 
 });
@@ -128,10 +123,10 @@ const resetPassword = asyncErrorWrapper(async (req, res, next) => {
     }
     let user = await User.findOne({
         resetPasswordToken: resetPasswordToken,
-        resetPasswordExpire: {$gt : Date.now()}
+        resetPasswordExpire: { $gt: Date.now() }
     });
 
-    if(!user) {
+    if (!user) {
         return next(new CustomError("Invalid token or session expired", 404));
     }
     user.password = password;
@@ -150,14 +145,14 @@ const resetPassword = asyncErrorWrapper(async (req, res, next) => {
 const editDetails = asyncErrorWrapper(async (req, res, next) => {
     const editInformation = req.body;
 
-    const user = await User.findByIdAndUpdate(req.user.id, editInformation,{
+    const user = await User.findByIdAndUpdate(req.user.id, editInformation, {
         new: true,
         runValidators: true
     });
 
     return res.status(200).json({
         success: true,
-        data:user
+        data: user
     });
 });
 

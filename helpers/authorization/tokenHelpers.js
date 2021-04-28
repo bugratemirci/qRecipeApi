@@ -11,20 +11,23 @@ const sendJwtClient = (user, res) => {
         access_token: token,
         data: {
             name: user.name,
-            email: user.email
+            email: user.email, 
+            id: user.id
         }
     });
 };
 
 const isTokenInclueded = (req) => {
-
-    return req.headers.authorization && req.headers.authorization.startsWith("Bearer:");
+    
+    return (req.headers.authorization && req.headers.authorization.startsWith("Bearer:")) || req.body.access_token.startsWith("Bearer:");
 
 }
 
 const getAccessTokenFromHeader = (req) => {
     const authorization = req.headers.authorization;
-    const access_token = authorization.split(" ")[1];
+    
+    const access_token = req.body.access_token.split(" ")[1];
+    console.log(access_token);
     return access_token;
 }
 
