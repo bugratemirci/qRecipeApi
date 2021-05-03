@@ -13,12 +13,13 @@ const getAllUsers = async (req, res, next) => {
 };
 const register = asyncErrorWrapper(async (req, res, next) => {
     // Post data
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, notification_token } = req.body;
     const user = await User.create({
         name,
         email,
         password,
-        role
+        role,
+        notification_token
     });
 
     sendJwtClient(user, res);
@@ -143,13 +144,18 @@ const resetPassword = asyncErrorWrapper(async (req, res, next) => {
 });
 
 const editDetails = asyncErrorWrapper(async (req, res, next) => {
-    const editInformation = req.body;
-
-    const user = await User.findByIdAndUpdate(req.user.id, editInformation, {
+    
+    const {id, editInformation, password} = req.body;
+    
+    const user = await User.findByIdAndUpdate(id, editInformation, {
         new: true,
-        runValidators: true
+        runValidators: true,
+        useFindAndModify: false
     });
 
+    user.password = password;
+    user.save();
+    
     return res.status(200).json({
         success: true,
         data: user

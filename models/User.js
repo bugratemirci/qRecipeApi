@@ -60,6 +60,10 @@ const UserSchema = new Schema({
     },
     resetPasswordExpire: {
         type: Date,
+    },
+    notification_token: {
+        type: String,
+        required: true
     }
 });
 

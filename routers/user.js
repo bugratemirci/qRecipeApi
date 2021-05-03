@@ -13,5 +13,6 @@ router.post("/login", login);
 router.get("/logout", logout);
 router.post("/forgotPassword", forgotPassword);
 router.put("/resetPassword", resetPassword);
-router.put("/edit", getAccessToRoute, editDetails)
+router.put("/edit", getAccessToRoute, editDetails);
+
 module.exports = router;
