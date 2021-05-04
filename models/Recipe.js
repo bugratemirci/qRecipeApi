@@ -41,7 +41,7 @@ RecipeSchema.pre("save", function (next) {
     if (!this.isModified("title")) {
         next();
     }
-
+    
     this.slug = this.makeSlug();
     next();
 });
@@ -53,4 +53,5 @@ RecipeSchema.methods.makeSlug = function () {
         lower: true      // convert to lower case, defaults to `false`
     });
 };
+
 module.exports = mongoose.model("Recipe", RecipeSchema);

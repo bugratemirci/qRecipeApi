@@ -12,13 +12,22 @@ const getAllRecipes = async (req, res, next) => {
 
 const getRecipeByName = asyncErrorWrapper(async (req, res, next) => {
     const { slug } = req.params;
-    
+
     //const recipe = await Recipe.find({"slug": slug});
-    const recipe = await Recipe.find().where({"slug": RegExp(slug)});
-    
+    const recipe = await Recipe.find().where({ "slug": RegExp(slug) });
+
 
     return res.status(200).json(recipe);
 });
+
+const getRecipeByIngredient = asyncErrorWrapper(async (req, res, next) => {
+    const { ingredients } = req.body;
+    console.log(ingredients);
+    const recipe = await Recipe.find({ingredients: {$in: ingredients}});
+
+    return res.status(200).json(recipe);
+});
+
 const enterARecipe = asyncErrorWrapper(async (req, res, next) => {
 
     const information = req.body;
@@ -134,5 +143,6 @@ module.exports = {
     deleteRecipe,
     likeRecipe,
     undoLikeRecipe,
-    getRecipeByName
+    getRecipeByName,
+    getRecipeByIngredient
 };
