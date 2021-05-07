@@ -31,23 +31,12 @@ const register = asyncErrorWrapper(async (req, res, next) => {
 });
 
 const imageUpload = asyncErrorWrapper(async (req, res, next) => {
-    const rootDirectory = path.dirname(require.main.filename);
+    
     const { id, profile_image } = req.body;
-    console.log(profile_image);
-    paths = `${id}_profile_photo.jpeg`;
-    fs.writeFile(rootDirectory + "/public/uploads/profile_images/" + paths, profile_image, "base64", (err) => {
-
-    });
-
-    copyFile(img, rootDirectory + "/public/uploads/profile_images/" + paths, (err) => {
-        if (err) {
-            next(new CustomError(err));
-        }
-    });
-
+    
 
     const user = await User.findByIdAndUpdate(id, {
-        "profile_image": "/uploads/profile_images/" + paths
+        "profile_image_string": profile_image
     }, {
         new: true,
         runValidators: true
@@ -66,6 +55,23 @@ const getUser = (req, res, next) => {
         name: req.user.name
     })
 };
+
+const createBase64String = asyncErrorWrapper(async (req, res, next) => {
+
+    const { base64_image, id } = req.body;
+
+    const user = await User.findByIdAndUpdate(id, {
+        base64_string: base64_image
+    },
+        {
+            new: true,
+            runValidators: true
+        });
+
+    res.status(200).json({
+        success: true,
+    });
+});
 
 const login = asyncErrorWrapper(async (req, res, next) => {
     const { email, password } = req.body;
@@ -197,5 +203,6 @@ module.exports = {
     forgotPassword,
     resetPassword,
     editDetails,
-    getProfilePhoto
+    getProfilePhoto,
+    createBase64String
 };

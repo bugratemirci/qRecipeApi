@@ -68,11 +68,14 @@ const editRecipe = asyncErrorWrapper(async (req, res, next) => {
 
 });
 
+
+
 const uploadRecipe = asyncErrorWrapper(async (req, res, next) => {
     
     const rootDirectory = path.dirname(require.main.filename);
     const { id, recipe_image, recipe_id } = req.body;
     console.log(recipe_image);
+    
     paths = `${recipe_id}_recipe_photo.jpeg`;
     fs.mkdir(rootDirectory + "/public/uploads/recipe_images/" + recipe_id, (err) => {
 

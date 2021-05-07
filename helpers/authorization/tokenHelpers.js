@@ -16,6 +16,7 @@ const sendJwtClient = (user, res) => {
             phone: user.phone,
             about: user.about,
             role: user.role,
+            profile_image_string: user.profile_image_string
         }
     });
 };
