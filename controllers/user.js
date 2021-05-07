@@ -4,6 +4,9 @@ const asyncErrorWrapper = require("express-async-handler");
 const { sendJwtClient } = require("../helpers/authorization/tokenHelpers");
 const { validateUserInputs, comparePassword } = require("../helpers/authorization/inputHelpers");
 const sendEmail = require("../helpers/libraries/sendEmail");
+const copyFile = require("fs-copy-file");
+const path = require("path");
+const fs = require("fs");
 
 const getAllUsers = async (req, res, next) => {
     const users = await User.find();
@@ -13,22 +16,38 @@ const getAllUsers = async (req, res, next) => {
 };
 const register = asyncErrorWrapper(async (req, res, next) => {
     // Post data
-    const { name, email, password, role, notification_token } = req.body;
+    const { name, email, password, role, notification_token, phone, about } = req.body;
     const user = await User.create({
         name,
         email,
         password,
         role,
-        notification_token
+        notification_token,
+        phone,
+        about
     });
 
     sendJwtClient(user, res);
 });
 
 const imageUpload = asyncErrorWrapper(async (req, res, next) => {
+    const rootDirectory = path.dirname(require.main.filename);
+    const { id, profile_image } = req.body;
+    console.log(profile_image);
+    paths = `${id}_profile_photo.jpeg`;
+    fs.writeFile(rootDirectory + "/public/uploads/profile_images/" + paths, profile_image, "base64", (err) => {
 
-    const user = await User.findByIdAndUpdate(req.user.id, {
-        "profile_image": req.savedProfileImage
+    });
+
+    copyFile(img, rootDirectory + "/public/uploads/profile_images/" + paths, (err) => {
+        if (err) {
+            next(new CustomError(err));
+        }
+    });
+
+
+    const user = await User.findByIdAndUpdate(id, {
+        "profile_image": "/uploads/profile_images/" + paths
     }, {
         new: true,
         runValidators: true
@@ -144,9 +163,9 @@ const resetPassword = asyncErrorWrapper(async (req, res, next) => {
 });
 
 const editDetails = asyncErrorWrapper(async (req, res, next) => {
-    
-    const {id, editInformation, password} = req.body;
-    
+
+    const { id, editInformation, password } = req.body;
+
     const user = await User.findByIdAndUpdate(id, editInformation, {
         new: true,
         runValidators: true,
@@ -155,13 +174,19 @@ const editDetails = asyncErrorWrapper(async (req, res, next) => {
 
     user.password = password;
     user.save();
-    
+
     return res.status(200).json({
         success: true,
         data: user
     });
 });
+const getProfilePhoto = asyncErrorWrapper(async (req, res, next) => {
+    const { id } = req.body;
+    const user = await User.findById(id)
 
+    res.status(200).json(user.profile_image);
+
+});
 module.exports = {
     getAllUsers,
     register,
@@ -171,5 +196,6 @@ module.exports = {
     logout,
     forgotPassword,
     resetPassword,
-    editDetails
+    editDetails,
+    getProfilePhoto
 };

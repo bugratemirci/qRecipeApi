@@ -12,7 +12,10 @@ const sendJwtClient = (user, res) => {
         data: {
             name: user.name,
             email: user.email, 
-            id: user.id
+            id: user.id,
+            phone: user.phone,
+            about: user.about,
+            role: user.role,
         }
     });
 };
@@ -25,9 +28,14 @@ const isTokenInclueded = (req) => {
 
 const getAccessTokenFromHeader = (req) => {
     const authorization = req.headers.authorization;
-    
+    const {id, profile_image} = req.body;
+    req.user = {
+        id,
+        profile_image
+    }
     const access_token = req.body.access_token.split(" ")[1];
-    console.log(access_token);
+    
+    
     return access_token;
 }
 

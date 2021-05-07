@@ -1,6 +1,9 @@
 const Recipe = require("../models/Recipe");
 const asyncErrorWrapper = require("express-async-handler");
 const CustomError = require("../helpers/errors/CustomError");
+const path = require("path");
+const fs = require("fs");
+const copyFile = require("fs-copy-file");
 
 const getAllRecipes = async (req, res, next) => {
 
@@ -23,7 +26,7 @@ const getRecipeByName = asyncErrorWrapper(async (req, res, next) => {
 const getRecipeByIngredient = asyncErrorWrapper(async (req, res, next) => {
     const { ingredients } = req.body;
     console.log(ingredients);
-    const recipe = await Recipe.find({ingredients: {$in: ingredients}});
+    const recipe = await Recipe.find({ ingredients: { $in: ingredients } });
 
     return res.status(200).json(recipe);
 });
@@ -66,10 +69,25 @@ const editRecipe = asyncErrorWrapper(async (req, res, next) => {
 });
 
 const uploadRecipe = asyncErrorWrapper(async (req, res, next) => {
-    const { id } = req.params;
+    
+    const rootDirectory = path.dirname(require.main.filename);
+    const { id, recipe_image, recipe_id } = req.body;
+    console.log(recipe_image);
+    paths = `${recipe_id}_recipe_photo.jpeg`;
+    fs.mkdir(rootDirectory + "/public/uploads/recipe_images/" + recipe_id, (err) => {
 
-    const recipe = await Recipe.findByIdAndUpdate(id, {
-        "recipe_image": req.savedRecipeImage
+    });
+    fs.writeFile(rootDirectory + "/public/uploads/recipe_images/" + recipe_id + "/" + paths, recipe_image, "base64", (err) => {
+
+    });
+    copyFile(recipe_image, rootDirectory + "/public/uploads/recipe_images/" + recipe_id + "/" + paths, (err) => {
+        if (err) {
+            next(new CustomError(err));
+        }
+    });
+
+    const recipe = await Recipe.findByIdAndUpdate(recipe_id, {
+        "recipe_image": "/public/uploads/recipe_images/" + recipe_id + "/" + paths
     }, {
         new: true,
         runValidators: true

@@ -35,16 +35,10 @@ const UserSchema = new Schema({
         type: Date,
         default: Date.now
     },
-    title: {
+    phone: {
         type: String,
     },
     about: {
-        type: String,
-    },
-    place: {
-        type: String,
-    },
-    website: {
         type: String,
     },
     profile_image: {
