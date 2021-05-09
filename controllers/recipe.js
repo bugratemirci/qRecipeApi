@@ -25,7 +25,7 @@ const getRecipeByName = asyncErrorWrapper(async (req, res, next) => {
 
 const getRecipeByIngredient = asyncErrorWrapper(async (req, res, next) => {
     const { ingredients } = req.body;
-    console.log(ingredients);
+    
     const recipe = await Recipe.find({ ingredients: { $in: ingredients } });
 
     return res.status(200).json(recipe);
@@ -34,13 +34,13 @@ const getRecipeByIngredient = asyncErrorWrapper(async (req, res, next) => {
 const enterARecipe = asyncErrorWrapper(async (req, res, next) => {
 
     const information = req.body;
-    console.log(information);
+    
     const recipe = await Recipe.create({
         "name": information.name,
         "description": information.description,
         "ingredients": information.ingredients,
-        "user": information.id
-
+        "user": information.id,
+        "recipe_image": information.base64_image
     });
 
     res
@@ -68,14 +68,47 @@ const editRecipe = asyncErrorWrapper(async (req, res, next) => {
 
 });
 
+const getRecipeWithId = asyncErrorWrapper(async (req, res, next) => {
 
+    const { id } = req.body;
+
+    const recipe = await Recipe.findById(id);
+
+    res.status(200).json(recipe);
+
+});
+
+const createBase64String = asyncErrorWrapper(async (req, res, next) => {
+
+    const { base64_image, id } = req.body;
+    
+    const recipe = await Recipe.findByIdAndUpdate(id, {
+        recipe_image: base64_image
+    },
+        {
+            new: true,
+            runValidators: true
+        });
+
+    res.status(200).json({
+        success: true,
+    });
+});
+
+const getSingleRecipe = asyncErrorWrapper(async (req,res,next) =>{
+    const {id} = req.params;
+
+    const user = await Recipe.findById(id);
+    
+    return res.status(200).json(user);
+});
 
 const uploadRecipe = asyncErrorWrapper(async (req, res, next) => {
-    
+
     const rootDirectory = path.dirname(require.main.filename);
     const { id, recipe_image, recipe_id } = req.body;
-    console.log(recipe_image);
-    
+
+
     paths = `${recipe_id}_recipe_photo.jpeg`;
     fs.mkdir(rootDirectory + "/public/uploads/recipe_images/" + recipe_id, (err) => {
 
@@ -102,10 +135,10 @@ const uploadRecipe = asyncErrorWrapper(async (req, res, next) => {
     });
 });
 
-const getSingleRecipe = asyncErrorWrapper(async (req, res, next) => {
+const getSingleRecipeById = asyncErrorWrapper(async (req, res, next) => {
     const { id } = req.params;
     const recipe = await Recipe.findById(id);
-
+    
     return res.status(200).json({
         success: true,
         data: recipe
@@ -165,5 +198,8 @@ module.exports = {
     likeRecipe,
     undoLikeRecipe,
     getRecipeByName,
-    getRecipeByIngredient
+    getRecipeByIngredient,
+    getRecipeWithId,
+    createBase64String,
+    getSingleRecipeById
 };
