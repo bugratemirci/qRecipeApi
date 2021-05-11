@@ -33,8 +33,41 @@ const deleteUser = asyncErrorWrapper(async (req, res, next) => {
         });
 });
 
-const deleteRecipe = asyncErrorWrapper(async (req, res, next) => {
-    const { id } = req.params;
+
+
+const allUsers = asyncErrorWrapper(async (req, res, next) => {
+
+    const users = await User.find();
+
+    return res
+    .status(200)
+    .json(users);
+});
+
+
+const editUser = asyncErrorWrapper(async (req, res, next) =>{
+    const { id, editInformation, password } = req.body;
+
+    const user = await User.findByIdAndUpdate(id, editInformation, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false
+    });
+
+    user.password = password;
+    user.save();
+
+    return res.status(200).json({
+        success: true,
+        data: user
+    });
+});
+const deleteRecipe = asyncErrorWrapper(async (req, res, next) =>{
+
+    const {id} = req.body;
+
+    console.log(id);
+
     const recipe = await Recipe.findById(id);
 
     await recipe.remove();
@@ -49,5 +82,7 @@ const deleteRecipe = asyncErrorWrapper(async (req, res, next) => {
 module.exports = {
     blockUser,
     deleteUser,
-    deleteRecipe
+    deleteRecipe,
+    allUsers,
+    editUser
 };
