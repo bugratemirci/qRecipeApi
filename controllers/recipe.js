@@ -32,7 +32,7 @@ const getRecipeByIngredient = asyncErrorWrapper(async (req, res, next) => {
 });
 
 const enterARecipe = asyncErrorWrapper(async (req, res, next) => {
-
+    
     const information = req.body;
     
     const recipe = await Recipe.create({
